@@ -1,51 +1,54 @@
-const refs = {
-  days: document.querySelector('span[data-value="days"]'),
-  hours: document.querySelector('span[data-value="hours"]'),
-  minutes: document.querySelector('span[data-value="mins"]'),
-  seconds: document.querySelector('span[data-value="secs"]'),
-};
-
-function pad(value) {
-  return String(value).padStart(2, '0');
-}
-
-function updateTimerFields(time) {
-  const days = pad(Math.floor(time / (1000 * 60 * 60 * 24)));
-  const hours = pad(
-    Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-  );
-  const mins = pad(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)));
-  const secs = pad(Math.floor((time % (1000 * 60)) / 1000));
-
-  refs.days.textContent = days;
-  refs.hours.textContent = hours;
-  refs.minutes.textContent = mins;
-  refs.seconds.textContent = secs;
-}
-
 class CountdownTimer {
   constructor({ selector, targetDate }) {
     this.selector = selector;
-    this.targetDate = targetDate;
+    this.targetDate = targetDate.getTime();
+    
+    this.time = 0;
+
+    this.days = document.querySelector(`${this.selector} span[data-value="days"]`);
+    this.hours = document.querySelector(`${this.selector} span[data-value="hours"]`);
+    this.mins = document.querySelector(`${this.selector} span[data-value="mins"]`);
+    this.secs = document.querySelector(`${this.selector} span[data-value="secs"]`);
+    this.start();
+  }
+
+
+  
+  timerUpdate(deltatime) {
+
+    const days = Math.floor(deltatime / (1000 * 60 * 60 * 24)).toString().padStart(2, "0");
+
+    const hours = Math.floor((deltatime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      .toString()
+      .padStart(2, "0");
+
+    const mins = Math.floor((deltatime % (1000 * 60 * 60)) / (1000 * 60))
+      .toString()
+      .padStart(2, "0");
+
+    const secs = Math.floor((deltatime % (1000 * 60)) / 1000)
+      .toString()
+      .padStart(2, "0");
+
+    this.days.textContent = days;
+    this.hours.textContent = hours;
+    this.mins.textContent = mins;
+    this.secs.textContent = secs;
   }
 
   start() {
-    updateTimerFields(0);
-
+     this.timerUpdate(0);
     setInterval(() => {
-      const delta = this.targetDate - Date.now();
-
-      updateTimerFields(delta);
+      const deltatime = this.targetDate - Date.now();
+      this.timerUpdate(deltatime);
     }, 1000);
   }
 }
 
-const countdownTimer = new CountdownTimer({
-  selector: '#timer-1',
-  targetDate: new Date('Jun 27, 2021'),
+const timer = new CountdownTimer({
+  selector: "#timer-1",
+  targetDate: new Date("Jun 27, 2021"),
 });
-
-countdownTimer.start();
 
 const colors = [
   '#FFFFFF',
